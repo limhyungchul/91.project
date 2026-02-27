@@ -1,0 +1,9 @@
+91.project/
+├── index.html              ← 로그인 성공 후 메인페이지
+├── app.js                 ← 서버 (수정 예정)
+├── package.json           ← 렌더용 (수정 예정)
+└── static/
+    └── login/
+        ├── LoginPage.html    ← 로그인페이지 (영문)
+        ├── Register.html     ← 회원가입 (예정)
+        └── Admin.html        ← 관리자페이지 (예정)
