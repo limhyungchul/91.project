@@ -1,9 +1,24 @@
-91.project/
-├── index.html              ← 로그인 성공 후 메인페이지
-├── app.js                 ← 서버 (수정 예정)
-├── package.json           ← 렌더용 (수정 예정)
+노드익스프레스 
+91.project/← 프로젝트폴더명
+├── index.html ← 로그인 성공 후 메인페이지
+├── app.js ← 서버 (수정 예정)
+├── package.json ← 렌더용 (수정 예정)
+└── 91.login/
+        ├── loginpage.html ← 로그인페이지 (영문)
+        ├── register.html ← 회원가입 (만듬)
+        │
+        └── private/
+            └── admin.html ← 관리자페이지 (만듬:단점평문) 
 └── static/
-    └── login/
-        ├── LoginPage.html    ← 로그인페이지 (영문)
-        ├── Register.html     ← 회원가입 (예정)
-        └── Admin.html        ← 관리자페이지 (예정)
+
+91.project/
+├── index.html
+├── app.js
+├── package.json
+└── static/
+    └── 91.login/
+        ├── loginpage.html
+        ├── register.html
+        └── private/
+            └── admin.html
+자 무료 신용카드없이 사용가능 관리필요없는 

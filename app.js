@@ -4,10 +4,13 @@ const app = express();
 
 const rootPath = process.cwd();
 
-// 정적 파일 서빙
-app.use(express.static(path.join(rootPath, 'static')));
+// 1. 루트에 index.html 서빙
+app.use(express.static(rootPath));
 
-// 첫 페이지 - 실제 영어 파일명으로 수정
+// 2. static 전체 서빙 (하위 폴더 모두 포함!)
+app.use('/static', express.static(path.join(rootPath, 'static')));
+
+// 3. 루트(/)는 로그인페이지
 app.get('/', (req, res) => {
     res.sendFile(path.join(rootPath, 'static', '91.login', 'loginpage.html'));
 });

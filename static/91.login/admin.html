@@ -206,10 +206,7 @@
 
     <script>
         const token = localStorage.getItem('token');
-        if (!token) {
-            alert("로그인 필요!");
-            location.href = '/index.html';
-        }
+
 
         // ✅ IP 관리 함수들 (독립 실행)
         async function api(url, options = {}) {
