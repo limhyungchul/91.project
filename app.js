@@ -9,7 +9,7 @@ app.use(express.static(path.join(rootPath, 'static')));
 
 // 첫 페이지 - 실제 영어 파일명으로 수정
 app.get('/', (req, res) => {
-    res.sendFile(path.join(rootPath, 'static', '91.login', 'Loginpage.html'));
+    res.sendFile(path.join(rootPath, 'static', '91.login', 'loginpage.html'));
 });
 
 const PORT = process.env.PORT || 10000;
