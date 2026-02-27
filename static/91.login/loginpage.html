@@ -15,7 +15,7 @@
             <input type="password" class="login-form-input" id="login-password" placeholder="비밀번호 입력" required>
             <button id="login-btn">로그인</button>
             <div style="margin-top:15px;text-align:center;">
-                <!-- ✅ 회원가입 링크 수정 -->
+                <!-- ✅ 수정1: 회원가입 링크 -->
                 <a href="./register.html" class="register-link" id="register-btn">
                     회원가입 / 아이디/비밀번호 찾기
                 </a>
@@ -23,8 +23,133 @@
         </div>
     </div>
 
-    <!-- 기존 CSS 그대로 -->
+    <!-- ✅ CSS 전체 그대로 (변경없음) -->
+    <style>
+        /* 로그인 박스 */
+        .login-box {
+            width: 95%;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 24px;
+            background: rgba(0,0,0,0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
 
+            .login-box h2 {
+                margin-bottom: 24px;
+                text-align: center;
+                color: #fff;
+                font-weight: 300;
+            }
+
+        #login-section > div {
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        .login-form-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            outline: none;
+            font-size: 14px;
+            box-sizing: border-box;
+            background: #111;
+            color: #fff;
+            transition: border-color 0.2s;
+        }
+
+            .login-form-input:focus {
+                border-color: #666;
+                box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+            }
+
+            .login-form-input::placeholder {
+                color: #888;
+            }
+
+        #login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+            #login-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+            }
+
+            #login-btn:active {
+                transform: translateY(0);
+            }
+
+        .register-link {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            color: #4fc3f7;
+            text-decoration: none;
+            font-size: 15px;
+            text-align: center;
+            border: 1px solid #777;
+            border-radius: 6px;
+            background: transparent;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+            .register-link:hover {
+                background: rgba(79,195,247,0.1);
+                border-color: #4fc3f7;
+                color: #fff;
+            }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #000000, #0a0a0a, #141414, #1e1e1e, #2a2a2a, #363636, #4a4a4a, #6a6a6a, #8a8a8a, #b0b0b0, #dcdcdc, #f0f0f0, #ffffff);
+            background-size: 600% 600%;
+            animation: gradientBG 25s ease infinite;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                margin: 20px auto;
+                padding: 20px;
+            }
+        }
+    </style>
+
+    <!-- ✅ 수정2: 로그인 성공 리다이렉트 -->
     <script>
         const AUTH_CONFIG = {
             ID: "admin",
@@ -45,8 +170,9 @@
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userId', inputId);
 
-                    < !-- ✅ 로그인 성공: 프로젝트 루트 index.html로 이동-- >
+                    < !--프로젝트 루트 index.html로 이동-- >
                     window.location.href = '/index.html';
+
             } else {
                 alert("아이디 또는 비밀번호가 틀렸습니다.");
                 document.getElementById('login-password').value = '';
