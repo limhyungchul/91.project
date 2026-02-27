@@ -10,7 +10,7 @@ app.use(express.static(path.join(rootPath, 'static')));
 
 // 첫 페이지 (로그인 페이지)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(rootPath, 'static', 'login', 'LoginPage.html'));
+    res.sendFile(path.join(rootPath, 'static', '91.login', 'LoginPage.html'));
 });
 
 // 포트 설정 (Render 기본 10000 대응)
