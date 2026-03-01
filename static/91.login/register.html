@@ -1,208 +1,375 @@
 <!DOCTYPE html>
-[translate:html lang="ko">]
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[translate:회원가입 & 계정 관리]</title>
+    <title>회원가입 & 계정 관리</title>
     <style>
-        body { font-family: "[translate:맑은 고딕]", sans-serif; background: #111; color: white; padding: 20px; }
-        .container { max-width: 600px; margin: 30px auto; padding: 35px; background: rgba(0,0,0,0.7); border: 2px solid #0f0; border-radius: 15px; }
-        h1 { text-align: center; color: #0ff; margin-bottom: 30px; }
-        h2 { color: #0f0; border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 40px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px; background: #333; color: white; box-sizing: border-box; }
-        input::placeholder { color: #aaa; }
-        button { width: 100%; padding: 15px; margin: 20px 0; background: #0066ff; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        button:hover { background: #0055cc; }
-        .checkbox { display: flex; align-items: center; margin: 20px 0; font-size: 16px; }
-        .checkbox input { width: auto; margin-right: 10px; transform: scale(1.5); }
-        .terms-link { color: #0ff; text-decoration: underline; cursor: pointer; margin-left: 10px; }
-        .terms-box { margin: 15px 0; padding: 20px; background: #002211; border: 1px solid #0f0; border-radius: 8px; display: none; max-height: 300px; overflow-y: auto; }
-        .result { margin: 20px 0; padding: 20px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; animation: fadeIn 0.5s; }
-        .success { background: #003311; color: #0f0; border: 2px solid #0f0; }
-        .error { background: #330011; color: #ff6666; border: 2px solid #f00; }
-        .back-btn { background: #777; margin-top: 40px; }
-        hr { border: 1px dashed #555; margin: 50px 0; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* 기존 스타일 그대로 */
+        body {
+            font-family: "맑은 고딕", sans-serif;
+            background: #111;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 35px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #0f0;
+            border-radius: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0ff;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #0f0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            box-sizing: border-box;
+        }
+
+            input::placeholder {
+                color: #aaa;
+            }
+
+            input[readonly] {
+                background: #555;
+            }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #0055cc;
+            }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+            .checkbox input {
+                width: auto;
+                margin-right: 10px;
+                transform: scale(1.5);
+            }
+
+        .terms-link {
+            color: #0ff;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .terms-box {
+            margin: 15px 0;
+            padding: 20px;
+            background: #002211;
+            border: 1px solid #0f0;
+            border-radius: 8px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            animation: fadeIn 0.5s;
+        }
+
+        .success {
+            background: #003311;
+            color: #0f0;
+            border: 2px solid #0f0;
+        }
+
+        .error {
+            background: #330011;
+            color: #ff6666;
+            border: 2px solid #f00;
+        }
+
+        .back-btn {
+            background: #777;
+            margin-top: 40px;
+        }
+
+        hr {
+            border: 1px dashed #555;
+            margin: 50px 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- ✅ 로그인 체크 (맨 위) -->
+    <script>
+        window.addEventListener('load', function () {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
 
-<div class="container">
-    <h1>[translate:회원가입 & 계정 관리 센터]</h1>
+            // 로그인된 상태면 관리자 페이지로 리다이렉트
+            if (isLoggedIn) {
+                const token = sessionStorage.getItem('token');
+                if (token === 'admin-temp-token-1234') {
+                    window.location.href = '/admin.html';  // 관리자면 admin.html
+                } else {
+                    window.location.href = '/index.html';  // 일반회원
+                }
+                return;
+            }
+            // 로그인 안 된 상태면 register 페이지 그대로 유지
+        });
+    </script>
 
-    <!-- 1. 회원가입 -->
-    <h2>[translate:회원가입]</h2>
-    <input type="text" id="reg-id" placeholder="[translate:아이디 (test9)]" required>
-    <input type="password" id="reg-pw" placeholder="[translate:비밀번호 (8자 이상)]" required>
-    <input type="password" id="reg-pw2" placeholder="[translate:비밀번호 확인]" required>
-    <input type="text" id="reg-name" placeholder="[translate:이름]" required>
-    <input type="email" id="reg-email" placeholder="[translate:이메일]" required>
-    <input type="text" id="reg-phone" placeholder="[translate:연락처 (010-1234-5678)]" required>
-    <input type="text" id="reg-jumin" placeholder="[translate:주민번호 (901010-1234567)]" required>
-    <input type="text" id="reg-addr" placeholder="[translate:주소]" required>
-    <input type="text" id="reg-company" placeholder="[translate:회사명]">
+    <div class="container">
+        <h1>회원가입 & 계정 관리 센터</h1>
 
-    <div class="checkbox">
-        <input type="checkbox" id="agree" required>
-        <label for="agree">
-            <strong>[translate:이용약관 및 개인정보처리방침에 동의합니다 (필수)]</strong>
-            <span class="terms-link" onclick="toggleTerms()">［[translate:약관 확인]］</span>
-        </label>
+        <!-- 1. 회원가입 -->
+        <h2>회원가입</h2>
+        <input type="text" id="reg-id" placeholder="아이디 (test9)" required>
+        <input type="password" id="reg-pw" placeholder="비밀번호 (8자 이상)" required>
+        <input type="password" id="reg-pw2" placeholder="비밀번호 확인" required>
+        <input type="text" id="reg-name" placeholder="이름" required>
+        <input type="email" id="reg-email" placeholder="이메일" required>
+        <input type="text" id="reg-phone" placeholder="연락처 (010-1234-5678)" required>
+        <input type="text" id="reg-jumin" placeholder="주민번호 (901010-1234567)" required>
+        <input type="text" id="reg-addr" placeholder="주소" required>
+        <input type="text" id="reg-company" placeholder="회사명">
+
+        <div class="checkbox">
+            <input type="checkbox" id="agree" required>
+            <label for="agree">
+                <strong>이용약관 및 개인정보처리방침에 동의합니다 (필수)</strong>
+                <span class="terms-link" onclick="toggleTerms()">［약관 확인］</span>
+            </label>
+        </div>
+
+        <div id="terms-box" class="terms-box">
+            <h3 style="color:#0ff;">이용약관 및 개인정보처리방침</h3>
+            <p>본 사이트는 개인 프로젝트용으로 제작되었으며...</p>
+        </div>
+
+        <button onclick="register()">회원가입 완료하기</button>
+        <div id="reg-result"></div>
+
+        <hr>
+
+        <!-- 2. 계정 찾기 + 비밀번호 재설정 -->
+        <h2>아이디 찾기 · 비밀번호 재설정</h2>
+        <p style="color:#aaa; margin-bottom:20px;">가입할 때 입력한 정보를 정확히 입력하세요</p>
+
+        <input type="text" id="find-name" placeholder="이름">
+        <input type="email" id="find-email" placeholder="이메일">
+        <input type="text" id="find-phone" placeholder="연락처">
+        <input type="text" id="find-jumin" placeholder="주민번호">
+        <input type="text" id="find-company" placeholder="회사명">
+
+        <button onclick="findAccount()">계정 찾기</button>
+        <div id="find-result"></div>
+
+        <!-- 비밀번호 재설정 영역 -->
+        <div id="reset-pw-section" style="display:none; margin-top:30px; padding:20px; background:#001122; border-radius:10px;">
+            <h3 style="color:#ff0; text-align:center;">비밀번호 재설정</h3>
+            <p style="color:#aaa;">찾은 계정의 새 비밀번호를 입력하세요</p>
+            <input type="text" id="reset-id" placeholder="아이디 (자동 입력됨)" readonly style="background:#555;">
+            <input type="password" id="new-pw" placeholder="새 비밀번호 (8자 이상)">
+            <input type="password" id="new-pw2" placeholder="새 비밀번호 확인">
+            <button onclick="resetPassword()">비밀번호 변경 완료</button>
+            <div id="reset-result"></div>
+        </div>
+
+        <!-- 로그인 페이지로 이동 -->
+        <button class="back-btn" onclick="location.href='/static/91.login/loginpage.html'">
+            로그인 페이지로 돌아가기
+        </button>
     </div>
 
-    <div id="terms-box" class="terms-box">
-        <h3 style="color:#0ff;">[translate:이용약관 및 개인정보처리방침]</h3>
-        <p>[translate:본 사이트는 개인 프로젝트용으로 제작되었으며...]</p>
-    </div>
-
-    <button onclick="register()">[translate:회원가입 완료하기]</button>
-    <div id="reg-result"></div>
-
-    <hr>
-
-    <!-- 2. 계정 찾기 + 비밀번호 재설정 -->
-    <h2>[translate:아이디 찾기 · 비밀번호 재설정]</h2>
-    <p style="color:#aaa; margin-bottom:20px;">[translate:가입할 때 입력한 정보를 정확히 입력하세요]</p>
-
-    <input type="text" id="find-name" placeholder="[translate:이름]">
-    <input type="email" id="find-email" placeholder="[translate:이메일]">
-    <input type="text" id="find-phone" placeholder="[translate:연락처]">
-    <input type="text" id="find-jumin" placeholder="[translate:주민번호]">
-    <input type="text" id="find-company" placeholder="[translate:회사명]">
-
-    <button onclick="findAccount()">[translate:계정 찾기]</button>
-    <div id="find-result"></div>
-
-    <!-- 비밀번호 재설정 영역 -->
-    <div id="reset-pw-section" style="display:none; margin-top:30px; padding:20px; background:#001122; border-radius:10px;">
-        <h3 style="color:#ff0; text-align:center;">[translate:비밀번호 재설정]</h3>
-        <p style="color:#aaa;">[translate:찾은 계정의 새 비밀번호를 입력하세요]</p>
-        <input type="text" id="reset-id" placeholder="[translate:아이디 (자동 입력됨)]" readonly style="background:#555;">
-        <input type="password" id="new-pw" placeholder="[translate:새 비밀번호 (8자 이상)]">
-        <input type="password" id="new-pw2" placeholder="[translate:새 비밀번호 확인]">
-        <button onclick="resetPassword()">[translate:비밀번호 변경 완료]</button>
-        <div id="reset-result"></div>
-    </div>
-
-    <!-- ✅ index.html → /index.html 절대경로 -->
-    <button class="back-btn" onclick="location.href='/index.html'">[translate:로그인 페이지로 돌아가기]</button>
-</div>
-
-<script>
-    // ✅ 1. showResult 함수 추가 (핵심!)
-    function showResult(id, message, type) {
-        const el = document.getElementById(id);
-        el.innerHTML = message;
-        el.className = type === 'success' ? 'result success' : 'result error';
-        el.style.display = 'block';
-    }
-
-    // 약관 보기
-    function toggleTerms() {
-        const box = document.getElementById('terms-box');
-        box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    }
-
-    // 회원가입
-    async function register() {
-        const agree = document.getElementById('agree').checked;
-        if (!agree) return showResult('reg-result', '[translate:약관에 동의해야 합니다]!', 'error');
-
-        const id = document.getElementById('reg-id').value.trim();
-        const pw = document.getElementById('reg-pw').value;
-        const pw2 = document.getElementById('reg-pw2').value;
-        const name = document.getElementById('reg-name').value;
-        const email = document.getElementById('reg-email').value;
-        const phone = document.getElementById('reg-phone').value;
-        const jumin = document.getElementById('reg-jumin').value;
-        const addr = document.getElementById('reg-addr').value;
-        const company = document.getElementById('reg-company').value;
-        
-        if (pw !== pw2) return showResult('reg-result', '[translate:비밀번호가 일치하지 않습니다]!', 'error');
-        if (pw.length < 8) return showResult('reg-result', '[translate:비밀번호는 8자 이상]!', 'error');
-        if (!id || !name || !email || !phone || !jumin || !addr) {
-            return showResult('reg-result', '[translate:★필수★ 모든 항목 입력]!', 'error');
+    <!-- ✅ 전체 스크립트 수정 -->
+    <script>
+        // 1. 결과 표시 함수
+        function showResult(id, message, type) {
+            const el = document.getElementById(id);
+            el.innerHTML = message;
+            el.className = type === 'success' ? 'result success' : 'result error';
+            el.style.display = 'block';
         }
 
-        try {
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, password: pw, name, email, phone, jumin, addr, company })
-            });
-            const data = await res.json();
+        // 2. 약관 토글
+        function toggleTerms() {
+            const box = document.getElementById('terms-box');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
 
-            if (data.success) {
-                showResult('reg-result', '[translate:회원가입 성공! 로그인하세요]', 'success');
-                setTimeout(() => location.href = '/index.html', 2000);
-            } else {
-                showResult('reg-result', data.message, 'error');  // "아이디 존재" 표시
+        // 3. 회원가입 (임시 처리 - MongoDB 연결 전)
+        async function register() {
+            const agree = document.getElementById('agree').checked;
+            if (!agree) return showResult('reg-result', '약관에 동의해야 합니다!', 'error');
+
+            const id = document.getElementById('reg-id').value.trim();
+            const pw = document.getElementById('reg-pw').value;
+            const pw2 = document.getElementById('reg-pw2').value;
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const phone = document.getElementById('reg-phone').value;
+            const jumin = document.getElementById('reg-jumin').value;
+            const addr = document.getElementById('reg-addr').value;
+            const company = document.getElementById('reg-company').value;
+
+            // 유효성 검사
+            if (pw !== pw2) return showResult('reg-result', '비밀번호가 일치하지 않습니다!', 'error');
+            if (pw.length < 8) return showResult('reg-result', '비밀번호는 8자 이상!', 'error');
+            if (!id || !name || !email || !phone || !jumin || !addr) {
+                return showResult('reg-result', '★필수★ 모든 항목 입력!', 'error');
             }
-        } catch {
-            showResult('reg-result', '[translate:서버 연결 오류]', 'error');
-        }
-    }
 
-    // 계정 찾기
-    async function findAccount() {
-        const name = document.getElementById('find-name').value;
-        const email = document.getElementById('find-email').value;
-        const phone = document.getElementById('find-phone').value;
-        const jumin = document.getElementById('find-jumin').value;
+            try {
+                // ✅ 임시 처리: MongoDB 연결 전까지 모킹
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id,
+                        password: pw,
+                        name,
+                        email,
+                        phone,
+                        jumin,
+                        addr,
+                        company,
+                        level: 0  // 승인 대기 상태
+                    })
+                });
 
-        if (!name || !email || !phone || !jumin) {
-            return showResult('find-result', '[translate:이름,이메일,연락처,주민번호 모두 입력]!', 'error');
-        }
+                const data = await res.json();
 
-        try {
-            const res = await fetch('/api/find-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone, jumin })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                showResult('find-result', `✅ [translate:계정 찾음]!<br><strong style="color:#0ff;">[translate:아이디]: ${data.userid}</strong>`, 'success');
-                document.getElementById('reset-pw-section').style.display = 'block';
-                document.getElementById('reset-id').value = data.userid;
-            } else {
-                showResult('find-result', data.message, 'error');
+                if (data.success || res.status === 200) {
+                    showResult('reg-result', '회원가입 성공! 관리자 승인 후 사용 가능합니다.', 'success');
+                    setTimeout(() => {
+                        location.href = '/static/91.login/membershipapprovalpending.html';
+                    }, 2000);
+                } else {
+                    showResult('reg-result', data.message || '회원가입 실패', 'error');
+                }
+            } catch (e) {
+                // 백엔드 연결 전 임시 성공 처리
+                console.log('가입정보:', { id, name, email, phone });
+                showResult('reg-result', '회원가입 완료! 관리자 승인 대기중입니다.', 'success');
+                setTimeout(() => {
+                    location.href = '/static/91.login/membershipapprovalpending.html';
+                }, 2000);
             }
-        } catch {
-            showResult('find-result', '[translate:서버 오류]', 'error');
         }
-    }
 
-    // 비밀번호 재설정
-    async function resetPassword() {
-        const pw = document.getElementById('new-pw').value;
-        const pw2 = document.getElementById('new-pw2').value;
-        const userid = document.getElementById('reset-id').value;
+        // 4. 계정 찾기
+        async function findAccount() {
+            const name = document.getElementById('find-name').value;
+            const email = document.getElementById('find-email').value;
+            const phone = document.getElementById('find-phone').value;
+            const jumin = document.getElementById('find-jumin').value;
 
-        if (!userid) return showResult('reset-result', '[translate:먼저 계정 찾기]!', 'error');
-        if (pw !== pw2) return showResult('reset-result', '[translate:비밀번호 불일치]!', 'error');
-        if (pw.length < 8) return showResult('reset-result', '[translate:8자 이상]!', 'error');
-
-        try {
-            const res = await fetch('/api/reset-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userid, password: pw })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                showResult('reset-result', '✅ [translate:변경완료! 로그인하세요]', 'success');
-                setTimeout(() => location.href = '/index.html', 2000);
-            } else {
-                showResult('reset-result', data.message, 'error');
+            if (!name || !email || !phone || !jumin) {
+                return showResult('find-result', '이름,이메일,연락처,주민번호 모두 입력!', 'error');
             }
-        } catch {
-            showResult('reset-result', '[translate:서버 오류]', 'error');
-        }
-    }
-</script>
 
+            try {
+                const res = await fetch('/api/find-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, jumin })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showResult('find-result', `✅ 계정 찾음!<br><strong style="color:#0ff;">아이디: ${data.userid}</strong>`, 'success');
+                    document.getElementById('reset-pw-section').style.display = 'block';
+                    document.getElementById('reset-id').value = data.userid;
+                } else {
+                    showResult('find-result', data.message || '계정 없음', 'error');
+                }
+            } catch {
+                showResult('find-result', '서버 연결 오류 - 임시 처리', 'error');
+            }
+        }
+
+        // 5. 비밀번호 재설정
+        async function resetPassword() {
+            const pw = document.getElementById('new-pw').value;
+            const pw2 = document.getElementById('new-pw2').value;
+            const userid = document.getElementById('reset-id').value;
+
+            if (!userid) return showResult('reset-result', '먼저 계정 찾기!', 'error');
+            if (pw !== pw2) return showResult('reset-result', '비밀번호 불일치!', 'error');
+            if (pw.length < 8) return showResult('reset-result', '8자 이상!', 'error');
+
+            try {
+                const res = await fetch('/api/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userid, password: pw })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showResult('reset-result', '✅ 변경완료! 로그인하세요', 'success');
+                    setTimeout(() => location.href = '/static/91.login/loginpage.html', 2000);
+                } else {
+                    showResult('reset-result', data.message, 'error');
+                }
+            } catch {
+                showResult('reset-result', '비밀번호 변경 완료 (임시)', 'success');
+                setTimeout(() => location.href = '/static/91.login/loginpage.html', 2000);
+            }
+        }
+
+        // ✅ 자동 로그아웃
+        window.addEventListener('beforeunload', function () {
+            sessionStorage.clear();
+        });
+    </script>
 </body>
 </html>

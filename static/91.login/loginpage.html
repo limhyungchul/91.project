@@ -170,7 +170,7 @@
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userId', inputId);
 
-                    < !--프로젝트 루트 index.html로 이동-- >
+                    //프로젝트 루트 index.html로 이동
                     window.location.href = '/index.html';
 
             } else {
@@ -180,6 +180,49 @@
             }
         });
 
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('login-btn').click();
+            }
+        });
+        // 모든 내용(html) 아래, </body> 바로 위에 추가
+        window.addEventListener('load', function () {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                // 로그인 안 된 상태면 로그인 페이지로 이동
+                window.location.href = '/static/91.login/loginpage.html';
+            }
+        });
+        const AUTH_CONFIG = {
+            ID: "admin",
+            PASSWORD: "1234"
+        };
+
+        document.getElementById('login-btn').addEventListener('click', function () {
+            const inputId = document.getElementById('login-id').value.trim();
+            const inputPw = document.getElementById('login-password').value.trim();
+
+            if (!inputId || !inputPw) {
+                alert("아이디와 비밀번호를 모두 입력해주세요.");
+                document.getElementById('login-id').focus();
+                return;
+            }
+
+            if (inputId === AUTH_CONFIG.ID && inputPw === AUTH_CONFIG.PASSWORD) {
+                // ✅ sessionStorage에 로그인 정보 + 토큰 저장
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userId', inputId);
+                sessionStorage.setItem('token', 'admin-temp-token-1234');  // 임시 토큰
+
+                window.location.href = '/index.html';
+            } else {
+                alert("아이디 또는 비밀번호가 틀렸습니다.");
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-password').focus();
+            }
+        });
+
+        // Enter 키 처리
         document.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 document.getElementById('login-btn').click();
