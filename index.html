@@ -1,107 +1,96 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <title>index.html - 인덱스</title>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
 
-    <link rel="stylesheet" href="static/91.css/indexstyle.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+        }
+
+        header {
+            background: #222;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        .links {
+            margin: 20px 40px;
+        }
+
+            .links a {
+                color: black;
+                margin-right: 15px;
+                text-decoration: none;
+            }
+
+                .links a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 </head>
+
 <body>
-    <header>Header</header>
-
-    <section>
-        <!-- 좌측 사이드바 -->
-        <aside id="sidebar-left">
-            코딩및정보
-            <ul id="menu">
-                <li class="color1">설치프로그램</li>
-                <li data-page="installationprograms">설치프로그램리스트</li>
-                <li class="color1">도구</li>
-                <li data-page=""> JSON 포맷터</li>a
-                <li data-page=""> Regex 테스트기</li>
-                <li data-page=""> UUID 생성기</li>
-
-                <li class="color1">테스트</li>
-
-                <li data-page="">API 테스트</li>
-                <li data-page=""> LocalStorage 관리</li>
-                <li class="color1">코딩</li>
-                <li class="color2">정보</li>
-                <li data-page="module">포트번호개념범위</li>
-                <li data-page="cmd">cmd</li>
-                <li class="color2">프로그램설치</li>
-                <li data-page="program">코딩프로그램(vsCommunity,node,git)</li>
-                <li class="color2">세팅</li>
-                <li data-page="tree">트리작성</li>
-                <li data-page="computer">컴퓨터적용영역</li>
-                <li data-page="codinglist">코딩시사용목록</li>
-                <li class="color2">로컬영역</li>
-                <li data-page="html">html</li>
-                <li data-page="css">css</li>
-                <li data-page="layout">layout</li>
-                <li data-page="ColorTableonBlackBackground">검은색 배경컬러테이블</li>
-                <li data-page="ColorTableonkwhiteground">흰색 배경컬러테이블</li>
-                <li data-page="javascript">javascript</li>
-                <li data-page="setting">설정</li>
-                <li data-page="error">오류</li>
-            </ul>
-        </aside>
-
-        <!-- 메인 영역 -->
-        <main id="main" style="flex:1; display:flex; flex-direction:column; min-height:0;">
-            <div>1.완전히 로컬 환경 기준</div>
-            <iframe id="content-frame"
-                    src="static/koding/a.html"
-                    scrolling="auto"
-                    frameborder="0"
-                    style="flex:1; width:100%; border:none;"></iframe>
-        </main>
 
 
-        <!-- 우측 사이드바 -->
-        <aside id="sidebar-right">
-            관리자모드및개인정보
-            <ul id="menu-right">
-                <li class="color1">코딩관련</li>
-                <li class="color2">간단한연결프로그램</li>
-                <li data-page="codeviewer">코드뷰어</li>
-                <li data-page="calculator">계산기</li>
-                <li data-page="liveprevieweditor">실시간코드에디터</li>
-                <li data-page="pixellap">픽셀이미지생성기</li>
-                <li data-page="favicongenerator">페비콘생성기</li>
-                <li data-page="darktree">트리생성기</li>
-                <li class="color2">테스트</li>
-                <li data-page="test">js테스트(포트사용없이)</li>
-                <li class="color1">테스트</li>
-                <li class="color1">app</li>
-                <li data-page="electronguide">🔥 Electron 한방가이드</li>
-                <li data-page="electronguide2">🔥 Electron 한방가이드2(진행예정)</li>
-                <li data-page="electronguide">cd C:/Users/lim52/Desktop/kd-app</li>
-                <li data-page="electronguide">npm start</li>
-                <li class="color1">간단한연결프로그램</li>
-                <li class="color1">간단한연결프로그램</li>
-                <li data-page="calculator">계산기</li>
-            </ul>
-        </aside>
-    </section>
+    <header>
+        <div>✅ 관리자 시스템 메인</div>
+        <div>
+            <span id="user-info"></span>
+            <button onclick="logout()">로그아웃</button>
+        </div>
+    </header>
 
+    <div class="container">
+        <h2>로그인 성공 🎉</h2>
+        <p>이 페이지가 보이면 JWT 인증 및 이동이 정상 작동한 상태입니다.</p>
+    </div>
+
+    <div class="links">
+        <a href="/admin.html">🔐 관리자 페이지</a>
+        <a href="/91.login/register.html">📝 회원가입</a>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () { // 페이지 HTML이 모두 로드된 후 실행
-            const allMenus = document.querySelectorAll('#menu li[data-page], #menu-right li[data-page]'); // 좌측과 우측 메뉴에서 data-page 속성이 있는 모든 li 선택
-            const iframe = document.getElementById('content-frame'); // iframe 요소를 변수에 저장
 
-            allMenus.forEach(item => { // 선택한 모든 li 메뉴 항목에 대해 반복
-                item.addEventListener('click', function () { // 각 li 클릭 시 실행되는 이벤트 등록
-                    const page = 'static/koding/' + this.getAttribute('data-page') + '.html'; // 클릭한 li의 data-page 값을 가져와 동적으로 iframe 경로 생성
-                    console.log('로드:', page); // 콘솔에 로드할 페이지 경로 출력 (디버깅용)
-                    iframe.src = page; // iframe의 src 속성을 새 페이지 경로로 변경 → 동적 페이지 로드
-                });
-            });
-        });
+        // ✅ 로그인 체크
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        const level = localStorage.getItem('userLevel');
+
+        //if (!token) {
+          //  alert('로그인이 필요합니다.');
+            //location.href = '/91.login/loginpage.html';
+       // }
+
+        // 사용자 표시
+      if (userId) {
+      document.getElementById('user-info').textContent =
+            userId + ' 님 (Lv.' + (level || 0) + ')';
+   }
+
+        // 로그아웃
+        function logout() {
+            localStorage.clear();
+            alert('로그아웃 되었습니다.');
+            location.href = '/91.login/loginpage.html';
+        }
+
     </script>
-
-
 
 </body>
 </html>

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 & 계정 관리</title>
+
     <style>
-        /* 기존 스타일 그대로 */
+        /* 기존 CSS 그대로 유지 */
         body {
             font-family: "맑은 고딕", sans-serif;
             background: #111;
@@ -48,10 +49,6 @@
             box-sizing: border-box;
         }
 
-            input::placeholder {
-                color: #aaa;
-            }
-
             input[readonly] {
                 background: #555;
             }
@@ -68,15 +65,19 @@
             cursor: pointer;
         }
 
-            button:hover {
+            button:hover:not(:disabled) {
                 background: #0055cc;
+            }
+
+            button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
             }
 
         .checkbox {
             display: flex;
             align-items: center;
             margin: 20px 0;
-            font-size: 16px;
         }
 
             .checkbox input {
@@ -110,7 +111,7 @@
             text-align: center;
             font-size: 18px;
             font-weight: bold;
-            animation: fadeIn 0.5s;
+            display: none;
         }
 
         .success {
@@ -130,245 +131,171 @@
             margin-top: 40px;
         }
 
-        hr {
-            border: 1px dashed #555;
-            margin: 50px 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
+            .back-btn:hover {
+                background: #666;
             }
 
-            to {
-                opacity: 1;
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
             }
         }
     </style>
 </head>
+
 <body>
-    <!-- ✅ 로그인 체크 (맨 위) -->
-    <script>
-        window.addEventListener('load', function () {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
-
-            // 로그인된 상태면 관리자 페이지로 리다이렉트
-            if (isLoggedIn) {
-                const token = sessionStorage.getItem('token');
-                if (token === 'admin-temp-token-1234') {
-                    window.location.href = '/admin.html';  // 관리자면 admin.html
-                } else {
-                    window.location.href = '/index.html';  // 일반회원
-                }
-                return;
-            }
-            // 로그인 안 된 상태면 register 페이지 그대로 유지
-        });
-    </script>
-
     <div class="container">
         <h1>회원가입 & 계정 관리 센터</h1>
 
-        <!-- 1. 회원가입 -->
         <h2>회원가입</h2>
-        <input type="text" id="reg-id" placeholder="아이디 (test9)" required>
-        <input type="password" id="reg-pw" placeholder="비밀번호 (8자 이상)" required>
-        <input type="password" id="reg-pw2" placeholder="비밀번호 확인" required>
-        <input type="text" id="reg-name" placeholder="이름" required>
-        <input type="email" id="reg-email" placeholder="이메일" required>
-        <input type="text" id="reg-phone" placeholder="연락처 (010-1234-5678)" required>
-        <input type="text" id="reg-jumin" placeholder="주민번호 (901010-1234567)" required>
-        <input type="text" id="reg-addr" placeholder="주소" required>
+
+        <input type="text" id="reg-id" placeholder="아이디 (영문+숫자 4~20자)">
+        <input type="password" id="reg-pw" placeholder="비밀번호 (8자 이상)">
+        <input type="password" id="reg-pw2" placeholder="비밀번호 확인">
+        <input type="text" id="reg-name" placeholder="이름 (필수)">
+        <input type="email" id="reg-email" placeholder="이메일 (필수)">
+        <input type="text" id="reg-phone" placeholder="연락처 (필수)" pattern="[0-9-]+">
+        <input type="text" id="reg-jumin" placeholder="주민번호 (필수, - 포함)">
+        <input type="text" id="reg-addr" placeholder="주소 (필수)">
         <input type="text" id="reg-company" placeholder="회사명">
 
         <div class="checkbox">
-            <input type="checkbox" id="agree" required>
+            <input type="checkbox" id="agree">
             <label for="agree">
-                <strong>이용약관 및 개인정보처리방침에 동의합니다 (필수)</strong>
-                <span class="terms-link" onclick="toggleTerms()">［약관 확인］</span>
+                <strong>이용약관 및 개인정보처리방침 동의 (필수)</strong>
+                <span class="terms-link" onclick="toggleTerms()">[약관 확인]</span>
             </label>
         </div>
 
         <div id="terms-box" class="terms-box">
-            <h3 style="color:#0ff;">이용약관 및 개인정보처리방침</h3>
-            <p>본 사이트는 개인 프로젝트용으로 제작되었으며...</p>
+            <p>본 사이트는 개인 프로젝트용입니다. 회원가입 후 관리자 승인 필요.</p>
         </div>
 
-        <button onclick="register()">회원가입 완료하기</button>
-        <div id="reg-result"></div>
+        <button id="reg-btn" onclick="register()">회원가입 완료</button>
+        <div id="reg-result" class="result"></div>
 
         <hr>
 
-        <!-- 2. 계정 찾기 + 비밀번호 재설정 -->
         <h2>아이디 찾기 · 비밀번호 재설정</h2>
-        <p style="color:#aaa; margin-bottom:20px;">가입할 때 입력한 정보를 정확히 입력하세요</p>
 
         <input type="text" id="find-name" placeholder="이름">
         <input type="email" id="find-email" placeholder="이메일">
         <input type="text" id="find-phone" placeholder="연락처">
         <input type="text" id="find-jumin" placeholder="주민번호">
-        <input type="text" id="find-company" placeholder="회사명">
 
         <button onclick="findAccount()">계정 찾기</button>
-        <div id="find-result"></div>
+        <div id="find-result" class="result"></div>
 
-        <!-- 비밀번호 재설정 영역 -->
-        <div id="reset-pw-section" style="display:none; margin-top:30px; padding:20px; background:#001122; border-radius:10px;">
-            <h3 style="color:#ff0; text-align:center;">비밀번호 재설정</h3>
-            <p style="color:#aaa;">찾은 계정의 새 비밀번호를 입력하세요</p>
-            <input type="text" id="reset-id" placeholder="아이디 (자동 입력됨)" readonly style="background:#555;">
-            <input type="password" id="new-pw" placeholder="새 비밀번호 (8자 이상)">
-            <input type="password" id="new-pw2" placeholder="새 비밀번호 확인">
-            <button onclick="resetPassword()">비밀번호 변경 완료</button>
-            <div id="reset-result"></div>
+        <div id="reset-pw-section" style="display:none;">
+            <input type="text" id="reset-id" readonly>
+            <input type="password" id="new-pw" placeholder="새 비밀번호">
+            <input type="password" id="new-pw2" placeholder="비밀번호 확인">
+            <button onclick="resetPassword()">비밀번호 변경</button>
+            <div id="reset-result" class="result"></div>
         </div>
 
-        <!-- 로그인 페이지로 이동 -->
         <button class="back-btn" onclick="location.href='/static/91.login/loginpage.html'">
             로그인 페이지로 돌아가기
         </button>
     </div>
 
-    <!-- ✅ 전체 스크립트 수정 -->
     <script>
-        // 1. 결과 표시 함수
+        'use strict';
+
+        // 공통 결과 표시 함수
         function showResult(id, message, type) {
             const el = document.getElementById(id);
             el.innerHTML = message;
-            el.className = type === 'success' ? 'result success' : 'result error';
+            el.className = `result ${type}`;
             el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
         }
 
-        // 2. 약관 토글
+        // 약관 토글
         function toggleTerms() {
             const box = document.getElementById('terms-box');
             box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
-        // 3. 회원가입 (임시 처리 - MongoDB 연결 전)
+        // 회원가입 처리 (app.js /api/register 와 100% 호환)
         async function register() {
-            const agree = document.getElementById('agree').checked;
-            if (!agree) return showResult('reg-result', '약관에 동의해야 합니다!', 'error');
+            const regBtn = document.getElementById('reg-btn');
 
+            if (!document.getElementById('agree').checked) {
+                return showResult('reg-result', '약관에 동의해야 합니다.', 'error');
+            }
+
+            // 입력값 가져오기
             const id = document.getElementById('reg-id').value.trim();
             const pw = document.getElementById('reg-pw').value;
             const pw2 = document.getElementById('reg-pw2').value;
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const phone = document.getElementById('reg-phone').value;
-            const jumin = document.getElementById('reg-jumin').value;
-            const addr = document.getElementById('reg-addr').value;
-            const company = document.getElementById('reg-company').value;
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const jumin = document.getElementById('reg-jumin').value.trim();
+            const addr = document.getElementById('reg-addr').value.trim();
+            const company = document.getElementById('reg-company').value.trim();
 
             // 유효성 검사
-            if (pw !== pw2) return showResult('reg-result', '비밀번호가 일치하지 않습니다!', 'error');
-            if (pw.length < 8) return showResult('reg-result', '비밀번호는 8자 이상!', 'error');
+            if (pw !== pw2) return showResult('reg-result', '비밀번호가 일치하지 않습니다.', 'error');
+            if (pw.length < 8) return showResult('reg-result', '비밀번호는 8자 이상이어야 합니다.', 'error');
             if (!id || !name || !email || !phone || !jumin || !addr) {
-                return showResult('reg-result', '★필수★ 모든 항목 입력!', 'error');
+                return showResult('reg-result', '★ 이름, 이메일, 연락처, 주민번호, 주소는 필수입니다.', 'error');
             }
 
+            // 서버 요청
+            regBtn.disabled = true;
+            regBtn.textContent = '회원가입 중...';
+
             try {
-                // ✅ 임시 처리: MongoDB 연결 전까지 모킹
-                const res = await fetch('/api/register', {
+                const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        id,
-                        password: pw,
-                        name,
-                        email,
-                        phone,
-                        jumin,
-                        addr,
-                        company,
-                        level: 0  // 승인 대기 상태
+                        id, password: pw, name, email, phone, jumin, addr, company
                     })
                 });
 
-                const data = await res.json();
+                const data = await response.json();
 
-                if (data.success || res.status === 200) {
-                    showResult('reg-result', '회원가입 성공! 관리자 승인 후 사용 가능합니다.', 'success');
+                if (data.success) {
+                    showResult('reg-result', '회원가입 성공! 관리자 승인 대기중입니다.', 'success');
                     setTimeout(() => {
-                        location.href = '/static/91.login/membershipapprovalpending.html';
+                        if (data.redirect) {
+                            location.href = data.redirect;
+                        } else {
+                            location.href = '/static/91.login/loginpage.html';
+                        }
                     }, 2000);
                 } else {
-                    showResult('reg-result', data.message || '회원가입 실패', 'error');
+                    showResult('reg-result', data.message || '회원가입에 실패했습니다.', 'error');
                 }
-            } catch (e) {
-                // 백엔드 연결 전 임시 성공 처리
-                console.log('가입정보:', { id, name, email, phone });
-                showResult('reg-result', '회원가입 완료! 관리자 승인 대기중입니다.', 'success');
-                setTimeout(() => {
-                    location.href = '/static/91.login/membershipapprovalpending.html';
-                }, 2000);
+
+            } catch (error) {
+                console.error('회원가입 오류:', error);
+                showResult('reg-result', '서버 연결 오류가 발생했습니다.', 'error');
+            } finally {
+                regBtn.disabled = false;
+                regBtn.textContent = '회원가입 완료';
             }
         }
 
-        // 4. 계정 찾기
+        // 임시 비활성화 (서버 API 구현 후 활성화)
         async function findAccount() {
-            const name = document.getElementById('find-name').value;
-            const email = document.getElementById('find-email').value;
-            const phone = document.getElementById('find-phone').value;
-            const jumin = document.getElementById('find-jumin').value;
-
-            if (!name || !email || !phone || !jumin) {
-                return showResult('find-result', '이름,이메일,연락처,주민번호 모두 입력!', 'error');
-            }
-
-            try {
-                const res = await fetch('/api/find-account', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, phone, jumin })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    showResult('find-result', `✅ 계정 찾음!<br><strong style="color:#0ff;">아이디: ${data.userid}</strong>`, 'success');
-                    document.getElementById('reset-pw-section').style.display = 'block';
-                    document.getElementById('reset-id').value = data.userid;
-                } else {
-                    showResult('find-result', data.message || '계정 없음', 'error');
-                }
-            } catch {
-                showResult('find-result', '서버 연결 오류 - 임시 처리', 'error');
-            }
+            showResult('find-result', '준비중입니다. (서버 API 개발 필요)', 'error');
         }
 
-        // 5. 비밀번호 재설정
         async function resetPassword() {
-            const pw = document.getElementById('new-pw').value;
-            const pw2 = document.getElementById('new-pw2').value;
-            const userid = document.getElementById('reset-id').value;
-
-            if (!userid) return showResult('reset-result', '먼저 계정 찾기!', 'error');
-            if (pw !== pw2) return showResult('reset-result', '비밀번호 불일치!', 'error');
-            if (pw.length < 8) return showResult('reset-result', '8자 이상!', 'error');
-
-            try {
-                const res = await fetch('/api/reset-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userid, password: pw })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    showResult('reset-result', '✅ 변경완료! 로그인하세요', 'success');
-                    setTimeout(() => location.href = '/static/91.login/loginpage.html', 2000);
-                } else {
-                    showResult('reset-result', data.message, 'error');
-                }
-            } catch {
-                showResult('reset-result', '비밀번호 변경 완료 (임시)', 'success');
-                setTimeout(() => location.href = '/static/91.login/loginpage.html', 2000);
-            }
+            showResult('reset-result', '준비중입니다. (서버 API 개발 필요)', 'error');
         }
 
-        // ✅ 자동 로그아웃
-        window.addEventListener('beforeunload', function () {
-            sessionStorage.clear();
+        // Enter키 지원
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const activeEl = document.activeElement;
+                if (activeEl.id === 'reg-pw2') register();
+            }
         });
     </script>
 </body>

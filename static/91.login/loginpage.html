@@ -1,31 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
-</head>
-<body>
-    <div class="login-box">
-        <div id="login-section">
-            <h2>로그인</h2>
-            <div>아이디:</div>
-            <input type="text" class="login-form-input" id="login-id" placeholder="아이디 입력" required>
-            <div>비밀번호:</div>
-            <input type="password" class="login-form-input" id="login-password" placeholder="비밀번호 입력" required>
-            <button id="login-btn">로그인</button>
-            <div style="margin-top:15px;text-align:center;">
-                <!-- ✅ 수정1: 회원가입 링크 -->
-                <a href="/static/91.login/register.html" class="register-link" id="register-btn">
-                    회원가입 / 아이디/비밀번호 찾기
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ✅ CSS 전체 그대로 (변경없음) -->
     <style>
-        /* 로그인 박스 */
+        /* 기존 CSS 그대로 유지 */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #000000, #0a0a0a, #141414, #1e1e1e, #2a2a2a, #363636, #4a4a4a, #6a6a6a, #8a8a8a, #b0b0b0, #dcdcdc, #f0f0f0, #ffffff);
+            background-size: 600% 600%;
+            animation: gradientBG 25s ease infinite;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
         .login-box {
             width: 95%;
             max-width: 400px;
@@ -87,13 +90,14 @@
             margin-top: 10px;
         }
 
-            #login-btn:hover {
+            #login-btn:hover:not(:disabled) {
                 transform: translateY(-1px);
                 box-shadow: 0 5px 15px rgba(102,126,234,0.4);
             }
 
-            #login-btn:active {
-                transform: translateY(0);
+            #login-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
             }
 
         .register-link {
@@ -118,27 +122,15 @@
                 color: #fff;
             }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(-45deg, #000000, #0a0a0a, #141414, #1e1e1e, #2a2a2a, #363636, #4a4a4a, #6a6a6a, #8a8a8a, #b0b0b0, #dcdcdc, #f0f0f0, #ffffff);
-            background-size: 600% 600%;
-            animation: gradientBG 25s ease infinite;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+        .error-msg {
+            display: none;
+            color: #ff6b6b;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,107,107,0.1);
+            border: 1px solid rgba(255,107,107,0.3);
+            border-radius: 6px;
+            text-align: center;
         }
 
         @media (max-width: 480px) {
@@ -148,86 +140,121 @@
             }
         }
     </style>
+</head>
+<body>
+    <div class="login-box">
+        <div id="login-section">
+            <h2>로그인</h2>
 
-    <!-- ✅ 수정2: 로그인 성공 리다이렉트 -->
+            <div class="error-msg" id="error-msg"></div>
+
+            <div>아이디:</div>
+            <input type="text" class="login-form-input" id="login-id" placeholder="아이디 입력" required>
+
+            <div>비밀번호:</div>
+            <input type="password" class="login-form-input" id="login-password" placeholder="비밀번호 입력" required>
+
+            <button id="login-btn">로그인</button>
+
+            <div style="margin-top:15px;text-align:center;">
+                <a href="/static/91.login/register.html" class="register-link">
+                    회원가입 / 아이디·비밀번호 찾기
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const AUTH_CONFIG = {
-            ID: "admin",
-            PASSWORD: "1234"
-        };
+        (function () {
+            'use strict';
 
-        document.getElementById('login-btn').addEventListener('click', function () {
-            const inputId = document.getElementById('login-id').value.trim();
-            const inputPw = document.getElementById('login-password').value.trim();
+            // DOM 요소
+            const loginBtn = document.getElementById('login-btn');
+            const loginId = document.getElementById('login-id');
+            const loginPw = document.getElementById('login-password');
+            const errorMsg = document.getElementById('error-msg');
 
-            if (!inputId || !inputPw) {
-                alert("아이디와 비밀번호를 모두 입력해주세요.");
-                document.getElementById('login-id').focus();
-                return;
+            // 에러 메시지 표시
+            function showError(message) {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
             }
 
-            if (inputId === AUTH_CONFIG.ID && inputPw === AUTH_CONFIG.PASSWORD) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userId', inputId);
-
-                    //프로젝트 루트 index.html로 이동
-                    window.location.href = '/index.html';
-
-            } else {
-                alert("아이디 또는 비밀번호가 틀렸습니다.");
-                document.getElementById('login-password').value = '';
-                document.getElementById('login-password').focus();
-            }
-        });
-
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                document.getElementById('login-btn').click();
-            }
-        });
-        // 모든 내용(html) 아래, </body> 바로 위에 추가
-        window.addEventListener('load', function () {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                // 로그인 안 된 상태면 로그인 페이지로 이동
-                window.location.href = '/static/91.login/loginpage.html';
-            }
-        });
-        const AUTH_CONFIG = {
-            ID: "admin",
-            PASSWORD: "1234"
-        };
-
-        document.getElementById('login-btn').addEventListener('click', function () {
-            const inputId = document.getElementById('login-id').value.trim();
-            const inputPw = document.getElementById('login-password').value.trim();
-
-            if (!inputId || !inputPw) {
-                alert("아이디와 비밀번호를 모두 입력해주세요.");
-                document.getElementById('login-id').focus();
-                return;
+            // 에러 메시지 숨기기
+            function hideError() {
+                errorMsg.style.display = 'none';
             }
 
-            if (inputId === AUTH_CONFIG.ID && inputPw === AUTH_CONFIG.PASSWORD) {
-                // ✅ sessionStorage에 로그인 정보 + 토큰 저장
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userId', inputId);
-                sessionStorage.setItem('token', 'admin-temp-token-1234');  // 임시 토큰
+            // 로그인 처리
+            async function handleLogin() {
+                const id = loginId.value.trim();
+                const pw = loginPw.value.trim();
 
-                window.location.href = '/index.html';
-            } else {
-                alert("아이디 또는 비밀번호가 틀렸습니다.");
-                document.getElementById('login-password').value = '';
-                document.getElementById('login-password').focus();
-            }
-        });
+                if (!id || !pw) {
+                    showError('아이디와 비밀번호를 모두 입력해주세요.');
+                    return;
+                }
 
-        // Enter 키 처리
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                document.getElementById('login-btn').click();
+                loginBtn.disabled = true;
+                loginBtn.textContent = '로그인 중...';
+                hideError();
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id, password: pw }),
+                    });
+
+                    // 응답이 JSON이 아니라면 에러 처리
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // 성공
+                    if (data.success) {
+                        // 로컬 스토리지에 저장
+                        localStorage.setItem('token', data.token || '');
+                        localStorage.setItem('userLevel', data.level);
+                        localStorage.setItem('userId', data.userid || '');
+
+                        // 서버에서 받은 redirect 경로로 이동, 없으면 index.html
+                        const target = data.redirect || '/index.html';
+                        if (target) {
+                            window.location.href = target;
+                        }
+                    } else {
+                        // 서버에서 보낸 에러 메시지
+                        showError(data.message || '로그인에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('로그인 오류:', error);
+                    showError('서버 연결 오류가 발생했습니다.');
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '로그인';
+                }
             }
-        });
+
+            // 로그인 버튼 클릭
+            loginBtn.addEventListener('click', handleLogin);
+
+            // Enter 키 처리
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !loginBtn.disabled) {
+                    handleLogin();
+                }
+            });
+
+            // 입력 필드 포커스 시 에러 메시지 숨기기
+            loginId.addEventListener('focus', hideError);
+            loginPw.addEventListener('focus', hideError);
+        })();
     </script>
+
 </body>
 </html>

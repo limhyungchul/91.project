@@ -1,24 +1,28 @@
-노드익스프레스 
-91.project/← 프로젝트폴더명
-├── index.html ← 로그인 성공 후 메인페이지
-├── app.js ← 서버 (수정 예정)
-├── package.json ← 렌더용 (수정 예정)
-└── 91.login/
-        ├── loginpage.html ← 로그인페이지 (영문)
-        ├── register.html ← 회원가입 (만듬)
-        │
-        └── private/
-            └── admin.html ← 관리자페이지 (만듬:단점평문) 
-└── static/
+cd C:\\Users\\lim52\\Desktop\91.project
 
+node app.js
+git add .
+git commit -m "전체파일수정반영"
+git push origin master
+서버 루트 대비 상대/절대 경로 구조
+지금 자꾸 실수하는것 
+1.login.html라고 자꾸설정하는데 loginpage.html 이거야
 91.project/
 ├── index.html
-├── app.js
+├── app.js(셋업,라우터 연결용)
+├── api-routes.js(api전담,잡기능포함나머지)
+├── .env
 ├── package.json
-└── static/
-    └── 91.login/
-        ├── loginpage.html
-        ├── register.html
-        └── private/
-            └── admin.html
-자 무료 신용카드없이 사용가능 관리필요없는 
+├── static/
+│   ├── 91.css/
+│   │   └── indexstyle.css
+│   ├── 91.login/
+│   │   ├── loginpage.html
+│   │   ├── register.html
+│   │   └── admin.html      ✅ (여기로 이동됨)
+│   └── koding/
+│       └── (다양한 도구들...)
+├── node_modules/
+└── 기타...
+(JWT 발급
+개발시 캐쉬,토큰 확실히 삭제

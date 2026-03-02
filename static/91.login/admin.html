@@ -1,8 +1,480 @@
-<!-- </body> 직전에 추가 -->
-<script>
-    window.addEventListener('load', function () {
-        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = '/static/91.login/loginpage.html';
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 대시보드 (개발용)</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: #111;
+            color: #eee;
         }
-    });
-</script>
+
+        header {
+            padding: 10px 20px;
+            background: #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            header h1 {
+                font-size: 18px;
+                margin: 0;
+            }
+
+            header button {
+                margin-left: 8px;
+                padding: 4px 10px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+
+        .logout {
+            background: #ff4757;
+            color: #fff;
+        }
+
+        .reload {
+            background: #2ecc71;
+            color: #fff;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            background: #181818;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #222;
+        }
+
+        tr:nth-child(even) td {
+            background: #161616;
+        }
+
+        tr:nth-child(odd) td {
+            background: #141414;
+        }
+
+        .btn {
+            padding: 2px 6px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 1px;
+        }
+
+        .btn-approve {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .btn-reject {
+            background: #c0392b;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background: #e67e22;
+            color: #fff;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .badge-pending {
+            background: #f1c40f;
+            color: #000;
+        }
+
+        .badge-approved {
+            background: #2ecc71;
+            color: #000;
+        }
+
+        .badge-rejected {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        #status-bar {
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #aaa;
+            padding: 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .loading-text {
+            color: #3498db;
+        }
+
+        .error-text {
+            color: #e74c3c;
+        }
+
+        .password-col {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>관리자 대시보드 (개발용)</h1>
+        <div>
+            <span id="admin-id-label">관리자</span>
+            <button class="reload" id="reload-btn">새로고침</button>
+            <button class="logout" id="logout-btn">로그아웃</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="status-bar">관리자 권한 확인 중...</div>
+
+        <section>
+            <h2>회원 전체 목록</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>아이디</th>
+                        <th>비밀번호</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>연락처</th>
+                        <th>주민번호</th>
+                        <th>주소</th>
+                        <th>회사명</th>
+                        <th>상태</th>
+                        <th>레벨</th>
+                        <th>가입일</th>
+                        <th>작업</th>
+                    </tr>
+                </thead>
+                <tbody id="user-tbody">
+                    <tr><td colspan="12">로딩중...</td></tr>
+                </tbody>
+            </table>
+        </section>
+        <section style="margin-top:20px; background:#201f1f; border-radius:6px; padding:12px; font-size:12px; border:1px solid #444;">
+            <h3 style="margin:0 0 6px; font-size:13px; color:#f1c40f;">⚠ 배포 시 / 평문 모드 전환 안내</h3>
+            <div style="line-height:1.5;">
+                <p style="margin:0 0 4px;">
+                    <strong>[A] 배포 시 서버 코드 변경 (평문 비밀번호 제거)</strong>
+                </p>
+
+                <p style="margin:0 0 4px;">
+                    <strong>1)</strong> <code>UserSchema</code>에서 아래 줄 삭제:
+                </p>
+                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
+plain_password: String,
+        </pre>
+
+                <p style="margin:8px 0 4px;">
+                    <strong>2)</strong> <code>/register</code> 라우터에서 평문 저장 줄 삭제:
+                </p>
+                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
+plain_password: password,
+        </pre>
+
+                <p style="margin:8px 0 4px;">
+                    <strong>3)</strong> <code>/admin/users</code> 라우터를 아래 <strong>배포용 코드</strong>로 교체:
+                </p>
+                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
+// 🔵 배포용: 평문 제거, 가공 없이 그대로 내려줌
+router.get('/admin/users', authenticateToken, async (req, res) =&gt; {
+    if (req.user.level &lt; 4) {
+        return res.status(403).json({ success: false, message: '관리자 권한 필요' });
+    }
+
+    try {
+        const users = await User.find().sort({ created_at: -1 });
+        res.json({ success: true, data: users });
+    } catch (error) {
+        console.error('회원목록 오류:', error);
+        res.status(500).json({ success: false });
+    }
+});
+        </pre>
+
+                <hr style="border:none;border-top:1px solid #333;margin:10px 0;">
+
+                <p style="margin:8px 0 4px;">
+                    <strong>[B] 다시 개발용 평문 모드로 돌리고 싶을 때 참고용 코드</strong>
+                </p>
+                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
+// 🔴 개발용: 평문을 password 필드로 내려주는 버전
+router.get('/admin/users', authenticateToken, async (req, res) =&gt; {
+    if (req.user.level &lt; 4) {
+        return res.status(403).json({ success: false, message: '관리자 권한 필요' });
+    }
+
+    try {
+        const users = await User.find().sort({ created_at: -1 });
+
+        const data = users.map(u =&gt; ({
+            userid: u.userid,
+            password: u.plain_password || '',
+            name: u.name,
+            email: u.email,
+            phone: u.phone,
+            jumin: u.jumin,
+            address: u.addr,
+            company: u.company,
+            status: u.status,
+            level: u.level,
+            created_at: u.created_at,
+        }));
+
+        res.json({ success: true, data });
+    } catch (error) {
+        console.error('회원목록 오류:', error);
+        res.status(500).json({ success: false });
+    }
+});
+        </pre>
+
+                <p style="margin:8px 0 0; color:#aaa;">
+                    ※ [A]는 서비스 배포용, [B]는 관리자 개발용(평문 확인용)입니다. 필요에 따라 서버의 <code>api-routes.js</code>에 복사/붙여넣기 하세요.
+                </p>
+            </div>
+        </section>
+        <!-- 비밀번호 표시 방식 요약 (개발용 메모) -->
+<pre style="margin-top:10px; background:#111; padding:8px; border-radius:4px; border:1px solid #333; font-size:11px; white-space:pre-wrap;">
+[비밀번호 평문 / 해시 모드 요약]
+
+1) DB 필드
+------------------------------------------------
+해시 저장   : password
+평문 저장   : plain_password    // 개발용에서만 사용
+
+
+2) 개발용 (평문 모드)
+------------------------------------------------
+// 회원가입 시
+password       = bcrypt(입력비번)
+plain_password = 입력비번
+
+// 관리자 목록 API (/admin/users)
+const data = users.map(u => ({
+  userid:   u.userid,
+  password: u.plain_password || '',  // 화면에 보이는 값 = 평문
+  ...
+}));
+res.json({ success: true, data });
+
+→ 관리자 페이지: user.password = 평문 비밀번호
+
+
+3) 배포용 (암호화 모드)
+------------------------------------------------
+// UserSchema 에서 삭제
+plain_password: String,
+
+// /register 에서 삭제
+plain_password: password,
+
+// /admin/users 를 단순 응답으로 변경
+const users = await User.find().sort({ created_at: -1 });
+res.json({ success: true, data: users });
+
+→ 관리자 페이지: user.password = bcrypt 해시 (평문 안 내려옴)
+</pre>
+
+
+
+    </main>
+
+
+    <script>
+        (function () {
+            'use strict';
+
+            // 기본 정보
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const userLevel = Number(localStorage.getItem('userLevel'));
+
+            const tbody = document.getElementById('user-tbody');
+            const statusBar = document.getElementById('status-bar');
+            const adminIdLabel = document.getElementById('admin-id-label');
+
+            // ✅ L4만 통과 (관리자 전용)
+            if (!token || userLevel !== 4) {
+                document.body.innerHTML = `
+                        <div style="background:#111;color:#eee;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:system-ui,sans-serif;">
+                            <h1 style="color:#ff4757;font-size:48px;margin:0;">🚫 접근 차단</h1>
+                            <p style="color:#aaa;font-size:18px;">관리자(L4)만 접근 가능합니다.</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            adminIdLabel.textContent = userId || 'admin';
+
+            function setStatus(msg, isError = false) {
+                statusBar.innerHTML = msg;
+                statusBar.className = isError ? 'error-text' : 'loading-text';
+            }
+
+            // 회원 목록 로드
+            async function loadUsers() {
+                setStatus('회원 목록 불러오는 중...');
+                tbody.innerHTML = '<tr><td colspan="12">로딩중...</td></tr>';
+
+                try {
+                    const response = await fetch('/api/admin/users', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (!data.success) throw new Error('회원 목록을 불러올 수 없습니다.');
+                    if (!data.data || data.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="12">등록된 회원이 없습니다.</td></tr>';
+                        setStatus('회원 0명');
+                        return;
+                    }
+
+                    tbody.innerHTML = data.data.map(user => {
+                        const statusBadge = {
+                            'pending': 'badge-pending',
+                            'approved': 'badge-approved',
+                            'rejected': 'badge-rejected'
+                        }[user.status] || '';
+
+                        const isTopAdmin = user.level === 4;
+                        const isMe = user.userid === userId;
+                        const actionButtons = (isTopAdmin || isMe)
+                            ? ''
+                            : `
+                                    <button class="btn btn-approve"
+                                            onclick="approveUser('${user.userid}', 'approved')"
+                                            ${user.status === 'approved' ? 'disabled' : ''}>승인</button>
+                                    <button class="btn btn-reject"
+                                            onclick="approveUser('${user.userid}', 'rejected')">거절</button>
+                                    <button class="btn btn-delete"
+                                            onclick="kickUser('${user.userid}')">삭제</button>
+                                  `;
+
+                        return `
+                                <tr>
+                                    <td>${user.userid || '-'}</td>
+                                    <td class="password-col">${user.password || '-'}</td>
+                                    <td>${user.name || '-'}</td>
+                                    <td>${user.email || '-'}</td>
+                                    <td>${user.phone || '-'}</td>
+                                    <td>${user.jumin || '-'}</td>
+                                    <td>${user.address || '-'}</td>
+                                    <td>${user.company || '-'}</td>
+                                    <td><span class="badge ${statusBadge}">${user.status || 'pending'}</span></td>
+                                    <td>L${user.level || 0}</td>
+                                    <td>${user.created_at ? new Date(user.created_at).toLocaleString('ko-KR') : '-'}</td>
+                                    <td>${actionButtons}</td>
+                                </tr>
+                            `;
+                    }).join('');
+
+                    setStatus(`회원 ${data.data.length}명`);
+                } catch (error) {
+                    console.error('회원 목록 오류:', error);
+                    tbody.innerHTML = '<tr><td colspan="12">서버 오류: ' + error.message + '</td></tr>';
+                    setStatus('오류 발생', true);
+                }
+            }
+
+            // 승인/거절
+            window.approveUser = async function (userid, status) {
+                if (!confirm(`${userid}을 ${status === 'approved' ? '승인' : '거절'}하시겠습니까?`)) return;
+                try {
+                    const response = await fetch('/api/admin/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ userid, status })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('처리 완료');
+                        loadUsers();
+                    } else {
+                        alert('처리 실패');
+                    }
+                } catch (error) {
+                    alert('서버 오류');
+                }
+            };
+
+            // 삭제
+            window.kickUser = async function (userid) {
+                if (!confirm(`${userid}을 삭제하시겠습니까?`)) return;
+                try {
+                    const response = await fetch('/api/admin/users', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ userid })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('삭제 완료');
+                        loadUsers();
+                    } else {
+                        alert('삭제 실패');
+                    }
+                } catch (error) {
+                    alert('서버 오류');
+                }
+            };
+
+            // 버튼 이벤트
+            document.getElementById('reload-btn').onclick = loadUsers;
+            document.getElementById('logout-btn').onclick = function () {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                    localStorage.clear();
+                    location.href = '/static/91.login/loginpage.html';
+                }
+            };
+
+            // 개발용 안내
+            if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                console.warn('⚠️ 개발용 페이지입니다. 실제 서비스에서 노출하지 마세요.');
+            }
+
+            // 초기 로드
+            loadUsers();
+        })();
+    </script>
+</body>
+</html>
