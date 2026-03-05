@@ -1,5 +1,3 @@
-몽고MongoDB Compass 웹에서설치됨
- mongosh 설치
 경고: 지금프로젝트 이름은 91.project
 여기서 MongoDB 데이터베이스 이름은 yourdb
 .env 파일확인
