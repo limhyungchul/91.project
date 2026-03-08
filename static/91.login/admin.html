@@ -170,7 +170,7 @@
                         <th>이름</th>
                         <th>이메일</th>
                         <th>연락처</th>
-                        <th>주민번호</th>
+                        <!-- 주민번호 컬럼 삭제 -->
                         <th>주소</th>
                         <th>회사명</th>
                         <th>상태</th>
@@ -180,139 +180,11 @@
                     </tr>
                 </thead>
                 <tbody id="user-tbody">
-                    <tr><td colspan="12">로딩중...</td></tr>
+                    <tr><td colspan="11">로딩중...</td></tr>
                 </tbody>
             </table>
         </section>
-        <section style="margin-top:20px; background:#201f1f; border-radius:6px; padding:12px; font-size:12px; border:1px solid #444;">
-            <h3 style="margin:0 0 6px; font-size:13px; color:#f1c40f;">⚠ 배포 시 / 평문 모드 전환 안내</h3>
-            <div style="line-height:1.5;">
-                <p style="margin:0 0 4px;">
-                    <strong>[A] 배포 시 서버 코드 변경 (평문 비밀번호 제거)</strong>
-                </p>
-
-                <p style="margin:0 0 4px;">
-                    <strong>1)</strong> <code>UserSchema</code>에서 아래 줄 삭제:
-                </p>
-                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
-plain_password: String,
-        </pre>
-
-                <p style="margin:8px 0 4px;">
-                    <strong>2)</strong> <code>/register</code> 라우터에서 평문 저장 줄 삭제:
-                </p>
-                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
-plain_password: password,
-        </pre>
-
-                <p style="margin:8px 0 4px;">
-                    <strong>3)</strong> <code>/admin/users</code> 라우터를 아래 <strong>배포용 코드</strong>로 교체:
-                </p>
-                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
-// 🔵 배포용: 평문 제거, 가공 없이 그대로 내려줌
-router.get('/admin/users', authenticateToken, async (req, res) =&gt; {
-    if (req.user.level &lt; 4) {
-        return res.status(403).json({ success: false, message: '관리자 권한 필요' });
-    }
-
-    try {
-        const users = await User.find().sort({ created_at: -1 });
-        res.json({ success: true, data: users });
-    } catch (error) {
-        console.error('회원목록 오류:', error);
-        res.status(500).json({ success: false });
-    }
-});
-        </pre>
-
-                <hr style="border:none;border-top:1px solid #333;margin:10px 0;">
-
-                <p style="margin:8px 0 4px;">
-                    <strong>[B] 다시 개발용 평문 모드로 돌리고 싶을 때 참고용 코드</strong>
-                </p>
-                <pre style="margin:4px 0; background:#111; padding:6px; border-radius:4px; border:1px solid #333; white-space:pre-wrap;">
-// 🔴 개발용: 평문을 password 필드로 내려주는 버전
-router.get('/admin/users', authenticateToken, async (req, res) =&gt; {
-    if (req.user.level &lt; 4) {
-        return res.status(403).json({ success: false, message: '관리자 권한 필요' });
-    }
-
-    try {
-        const users = await User.find().sort({ created_at: -1 });
-
-        const data = users.map(u =&gt; ({
-            userid: u.userid,
-            password: u.plain_password || '',
-            name: u.name,
-            email: u.email,
-            phone: u.phone,
-            jumin: u.jumin,
-            address: u.addr,
-            company: u.company,
-            status: u.status,
-            level: u.level,
-            created_at: u.created_at,
-        }));
-
-        res.json({ success: true, data });
-    } catch (error) {
-        console.error('회원목록 오류:', error);
-        res.status(500).json({ success: false });
-    }
-});
-        </pre>
-
-                <p style="margin:8px 0 0; color:#aaa;">
-                    ※ [A]는 서비스 배포용, [B]는 관리자 개발용(평문 확인용)입니다. 필요에 따라 서버의 <code>api-routes.js</code>에 복사/붙여넣기 하세요.
-                </p>
-            </div>
-        </section>
-        <!-- 비밀번호 표시 방식 요약 (개발용 메모) -->
-<pre style="margin-top:10px; background:#111; padding:8px; border-radius:4px; border:1px solid #333; font-size:11px; white-space:pre-wrap;">
-[비밀번호 평문 / 해시 모드 요약]
-
-1) DB 필드
-------------------------------------------------
-해시 저장   : password
-평문 저장   : plain_password    // 개발용에서만 사용
-
-
-2) 개발용 (평문 모드)
-------------------------------------------------
-// 회원가입 시
-password       = bcrypt(입력비번)
-plain_password = 입력비번
-
-// 관리자 목록 API (/admin/users)
-const data = users.map(u => ({
-  userid:   u.userid,
-  password: u.plain_password || '',  // 화면에 보이는 값 = 평문
-  ...
-}));
-res.json({ success: true, data });
-
-→ 관리자 페이지: user.password = 평문 비밀번호
-
-
-3) 배포용 (암호화 모드)
-------------------------------------------------
-// UserSchema 에서 삭제
-plain_password: String,
-
-// /register 에서 삭제
-plain_password: password,
-
-// /admin/users 를 단순 응답으로 변경
-const users = await User.find().sort({ created_at: -1 });
-res.json({ success: true, data: users });
-
-→ 관리자 페이지: user.password = bcrypt 해시 (평문 안 내려옴)
-</pre>
-
-
-
     </main>
-
 
     <script>
         (function () {
@@ -327,7 +199,7 @@ res.json({ success: true, data: users });
             const statusBar = document.getElementById('status-bar');
             const adminIdLabel = document.getElementById('admin-id-label');
 
-            // ✅ L4만 통과 (관리자 전용)
+            // L4만 통과 (관리자 전용)
             if (!token || userLevel !== 4) {
                 document.body.innerHTML = `
                         <div style="background:#111;color:#eee;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:system-ui,sans-serif;">
@@ -348,7 +220,7 @@ res.json({ success: true, data: users });
             // 회원 목록 로드
             async function loadUsers() {
                 setStatus('회원 목록 불러오는 중...');
-                tbody.innerHTML = '<tr><td colspan="12">로딩중...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11">로딩중...</td></tr>';
 
                 try {
                     const response = await fetch('/api/admin/users', {
@@ -358,7 +230,7 @@ res.json({ success: true, data: users });
 
                     if (!data.success) throw new Error('회원 목록을 불러올 수 없습니다.');
                     if (!data.data || data.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="12">등록된 회원이 없습니다.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="11">등록된 회원이 없습니다.</td></tr>';
                         setStatus('회원 0명');
                         return;
                     }
@@ -391,7 +263,7 @@ res.json({ success: true, data: users });
                                     <td>${user.name || '-'}</td>
                                     <td>${user.email || '-'}</td>
                                     <td>${user.phone || '-'}</td>
-                                    <td>${user.jumin || '-'}</td>
+                                    <!-- 주민번호 데이터 삭제 -->
                                     <td>${user.address || '-'}</td>
                                     <td>${user.company || '-'}</td>
                                     <td><span class="badge ${statusBadge}">${user.status || 'pending'}</span></td>
@@ -405,7 +277,7 @@ res.json({ success: true, data: users });
                     setStatus(`회원 ${data.data.length}명`);
                 } catch (error) {
                     console.error('회원 목록 오류:', error);
-                    tbody.innerHTML = '<tr><td colspan="12">서버 오류: ' + error.message + '</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11">서버 오류: ' + error.message + '</td></tr>';
                     setStatus('오류 발생', true);
                 }
             }
