@@ -4,9 +4,7 @@ node app.js
 git add .
 git commit -m "전체파일수정반영"
 git push origin master
-서버 루트 대비 상대/절대 경로 구조
-지금 자꾸 실수하는것 
-1.login.html라고 자꾸설정하는데 loginpage.html 이거야
+
 91.project/
 ├── index.html
 ├── app.js(셋업,라우터 연결용)
@@ -14,15 +12,8 @@ git push origin master
 ├── .env
 ├── package.json
 ├── static/
-│   ├── 91.css/
-│   │   └── indexstyle.css
 │   ├── 91.login/
 │   │   ├── loginpage.html
 │   │   ├── register.html
 │   │   └── admin.html      ✅ (여기로 이동됨)
-│   └── koding/
-│       └── (다양한 도구들...)
-├── node_modules/
-└── 기타...
-(JWT 발급
-개발시 캐쉬,토큰 확실히 삭제
+
